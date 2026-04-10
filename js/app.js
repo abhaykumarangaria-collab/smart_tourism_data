@@ -94,7 +94,7 @@ async function fetchEnvironmentData(city) {
     aqiDisplay.innerHTML = '<p style="color: #888;">Scanning air quality sensors...</p>';
     
     // YOUR API KEY:
-    const apiKey = '51be64207ac08e8b1012336287076270'; 
+    const apiKey = 'WEATHER_API_KEY'; 
 
     try {
         // Fetch Weather
