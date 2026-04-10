@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tourism & Environment Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1>EcoRoute Explorer</h1>
+            <div class="search-bar">
+                <input type="text" id="city-input" placeholder="Enter a city to explore...">
+                <button id="search-btn">Search</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="card" id="weather-card">
+            <h2>Current Weather</h2>
+            <div class="data-display" id="weather-display">
+                <p class="placeholder-text">Enter a city to see weather data.</p>
+            </div>
+        </section>
+
+        <section class="card" id="aqi-card">
+            <h2>Air Quality (AQI)</h2>
+            <div class="data-display" id="aqi-display">
+                 <p class="placeholder-text">Enter a city to see AQI data.</p>
+            </div>
+        </section>
+
+        <section class="card full-width" id="recommendation-card">
+            <h2>Smart Itinerary Recommendations</h2>
+            <div class="data-display" id="recommendation-display">
+                <p class="placeholder-text">Recommendations will appear based on environmental conditions.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

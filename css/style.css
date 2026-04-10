@@ -1,0 +1,148 @@
+/* Base Variables - We will change these with JS based on the weather */
+:root {
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-main: #333;
+    --primary-color: #007bff;
+    --accent-color: #e0e0e0;
+    --alert-color: #28a745; /* Green by default */
+}
+
+/* Dynamic Themes added via JS */
+body.theme-rainy {
+    --bg-color: #e2e8f0;
+    --card-bg: #f8fafc;
+    --primary-color: #475569;
+}
+
+body.theme-poor-air {
+    --alert-color: #dc3545; /* Red alert */
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    transition: background-color 0.4s ease;
+    padding-bottom: 2rem;
+}
+
+/* Header */
+header {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+.header-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.search-bar input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px 0 0 4px;
+    width: 250px;
+}
+
+.search-bar button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.search-bar button:hover {
+    opacity: 0.9;
+}
+
+/* Dashboard Grid */
+.dashboard-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+}
+
+.card {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.card h2 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+}
+
+/* Dynamic Data Display Styles */
+.temp-large {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.aqi-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background-color: var(--alert-color);
+    color: white;
+    font-weight: bold;
+    margin-top: 0.5rem;
+}
+
+.recommendation-list {
+    list-style-type: none;
+}
+
+.recommendation-list li {
+    padding: 0.75rem;
+    background-color: rgba(0, 123, 255, 0.1);
+    margin-bottom: 0.5rem;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+    }
+    .search-bar input {
+        width: 100%;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+    .search-bar button {
+        width: 100%;
+        border-radius: 4px;
+    }
+}
