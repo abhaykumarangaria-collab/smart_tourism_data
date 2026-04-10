@@ -14,10 +14,6 @@
 * **SPA Architecture:** Implements seamless tabbed navigation without page reloads, mimicking the feel of modern frontend frameworks using Vanilla JavaScript.
 * **State Management:** Utilizes `localStorage` for persistent user sessions and a simulated login experience.
 
-## 📸 Screenshots
-
-*(Replace this text with a screenshot of your dashboard once it's live! You can drag and drop an image directly into the GitHub editor to generate a link).*
-
 ## 🛠️ Tech Stack
 
 * **Frontend:** HTML5, CSS3 (CSS Variables, Flexbox, Grid, Keyframe Animations)
