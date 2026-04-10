@@ -1,11 +1,11 @@
-// DOM Elements
+// 1. DOM Elements
 const cityInput = document.getElementById('city-input');
 const searchBtn = document.getElementById('search-btn');
 const weatherDisplay = document.getElementById('weather-display');
 const aqiDisplay = document.getElementById('aqi-display');
 const recommendationDisplay = document.getElementById('recommendation-display');
 
-// Event Listener for the Search Button
+// 2. Event Listener for the Search Button
 searchBtn.addEventListener('click', () => {
     const city = cityInput.value.trim();
     if (city) {
@@ -15,39 +15,68 @@ searchBtn.addEventListener('click', () => {
     }
 });
 
-// Main Function to Fetch and Process Data
-async function fetchEnvironmentData(city) {
-    // Show loading state
-    weatherDisplay.innerHTML = '<p>Loading...</p>';
-    aqiDisplay.innerHTML = '<p>Loading...</p>';
-    
-    try {
-        /* =========================================================
-        REAL API IMPLEMENTATION (Commented out for now)
-        Once you get a free API key from OpenWeatherMap, uncomment this:
-        
-        const apiKey = 'YOUR_OPENWEATHER_API_KEY';
-        const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
-        const weatherData = await weatherResponse.json();
-        =========================================================
-        */
+// 3. Event Listener for the 'Enter' Key
+cityInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); 
+        searchBtn.click(); 
+    }
+});
 
-        // MOCK DATA: Simulating a response from an API for immediate testing
-        const mockData = getMockData(city);
+// 4. Main Function to Fetch Live Data
+async function fetchEnvironmentData(city) {
+    weatherDisplay.innerHTML = '<p>Loading weather...</p>';
+    aqiDisplay.innerHTML = '<p>Loading air quality...</p>';
+    
+    // Your OpenWeatherMap API Key:
+    const apiKey = '51be64207ac08e8b1012336287076270'; 
+
+    try {
+        // Fetch Weather Data
+        const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
         
-        // Process and Display Data
-        updateWeatherUI(mockData.weather);
-        updateAqiUI(mockData.aqi);
-        generateSmartRecommendations(mockData.weather, mockData.aqi);
-        updateTheme(mockData.weather.condition, mockData.aqi.value);
+        if (!weatherResponse.ok) {
+            throw new Error('City not found');
+        }
+        
+        const rawWeatherData = await weatherResponse.json();
+
+        // Extract Coordinates for the AQI API
+        const lat = rawWeatherData.coord.lat;
+        const lon = rawWeatherData.coord.lon;
+
+        // Fetch Air Pollution Data
+        const aqiResponse = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
+        const rawAqiData = await aqiResponse.json();
+
+        // Format the data for our UI
+        const weather = {
+            temp: Math.round(rawWeatherData.main.temp),
+            condition: rawWeatherData.weather[0].main,
+            humidity: rawWeatherData.main.humidity
+        };
+        
+        const aqi = {
+            value: rawAqiData.list[0].main.aqi // OpenWeather returns an index from 1 to 5
+        };
+
+        // Update the UI
+        updateWeatherUI(weather);
+        updateAqiUI(aqi);
+        
+        // We multiply the 1-5 scale by 50 just so it works with our existing Smart Algorithm logic
+        generateSmartRecommendations(weather, { value: aqi.value * 50 });
+        updateTheme(weather.condition, aqi.value * 50);
 
     } catch (error) {
-        console.error("Error fetching data:", error);
-        weatherDisplay.innerHTML = '<p>Error loading data. Please try again.</p>';
+        console.error("Error:", error);
+        weatherDisplay.innerHTML = `<p style="color: red;">Error: ${error.message}. Please check spelling.</p>`;
+        aqiDisplay.innerHTML = '';
+        recommendationDisplay.innerHTML = '';
     }
 }
 
-// UI Update Functions
+// 5. UI Update Functions
 function updateWeatherUI(weather) {
     weatherDisplay.innerHTML = `
         <div class="temp-large">${weather.temp}°C</div>
@@ -56,33 +85,42 @@ function updateWeatherUI(weather) {
     `;
 }
 
+// Updated AQI UI Function (Maps 1-5 scale to text)
 function updateAqiUI(aqi) {
     let status = 'Good';
-    if (aqi.value > 100) status = 'Unhealthy';
-    if (aqi.value > 200) status = 'Hazardous';
+    let alertColor = 'var(--alert-color)'; // Default green
+
+    // OpenWeatherMap AQI Scale: 1=Good, 2=Fair, 3=Moderate, 4=Poor, 5=Very Poor
+    if (aqi.value === 3) {
+        status = 'Moderate';
+        alertColor = '#ffc107'; // Yellow
+    } else if (aqi.value >= 4) {
+        status = 'Poor / Hazardous';
+        alertColor = '#dc3545'; // Red
+    }
 
     aqiDisplay.innerHTML = `
-        <h3>Index: ${aqi.value}</h3>
-        <span class="aqi-badge">${status}</span>
+        <h3>Index Level: ${aqi.value} / 5</h3>
+        <span class="aqi-badge" style="background-color: ${alertColor};">${status}</span>
     `;
 }
 
-// The "Smart" Algorithm
+// 6. The "Smart" Algorithm
 function generateSmartRecommendations(weather, aqi) {
     let recommendations = [];
 
     // Weather rules
     if (weather.condition.toLowerCase().includes('rain')) {
-        recommendations.push("Heavy rain expected. Consider indoor activities like visiting local museums or art galleries.");
+        recommendations.push("Rain expected. Consider indoor activities or museums.");
     } else if (weather.temp > 35) {
-        recommendations.push("Extreme heat. Stay hydrated, avoid outdoor hiking between 12 PM and 4 PM.");
+        recommendations.push("Extreme heat. Stay hydrated and avoid outdoor activities during peak afternoon hours.");
     } else {
         recommendations.push("Weather is optimal for outdoor sightseeing and walking tours.");
     }
 
     // AQI rules
     if (aqi.value > 150) {
-        recommendations.push("Poor air quality detected. Wearing an N95 mask is recommended outdoors.");
+        recommendations.push("Poor air quality detected. Wearing a mask is recommended outdoors.");
         recommendations.push("Sensitive groups should avoid prolonged outdoor exertion.");
     }
 
@@ -96,34 +134,14 @@ function generateSmartRecommendations(weather, aqi) {
     recommendationDisplay.innerHTML = listHTML;
 }
 
-// Dynamic Theming
+// 7. Dynamic Theming
 function updateTheme(condition, aqiValue) {
-    // Reset classes
-    document.body.className = '';
+    document.body.className = ''; // Reset classes
     
-    // Set weather theme
     if (condition.toLowerCase().includes('rain')) {
         document.body.classList.add('theme-rainy');
     }
-
-    // Set AQI theme (overrides accent colors)
     if (aqiValue > 100) {
         document.body.classList.add('theme-poor-air');
-    }
-}
-
-// --- Helper Function for Mocking Data ---
-function getMockData(city) {
-    // Simulate different conditions based on city length just to show varied data
-    if (city.length > 6) {
-        return {
-            weather: { temp: 22, condition: 'Rainy', humidity: 80 },
-            aqi: { value: 65 } // Good air, bad weather
-        };
-    } else {
-        return {
-            weather: { temp: 36, condition: 'Clear', humidity: 40 },
-            aqi: { value: 160 } // Good weather, bad air
-        };
     }
 }
