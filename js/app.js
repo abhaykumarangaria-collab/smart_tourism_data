@@ -92,8 +92,12 @@ async function triggerSearch() {
 }
 
 async function fetchEnvironmentData(city) {
-    const apiKey = CONFIG.API_KEY; 
+    weatherDisplay.innerHTML = '<p style="color: #888;">Fetching weather data...</p>';
+    aqiDisplay.innerHTML = '<p style="color: #888;">Scanning air quality sensors...</p>';
     
+    // YOUR API KEY:
+    const apiKey = '51be64207ac08e8b1012336287076270'; 
+
     try {
         // 1. Fetch Current Weather
         const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
